@@ -53,7 +53,7 @@ class RotationTable():
 
         start = time.time()
         while (time.time()-start < self.timeout):
-            buf = self.__receiveLine()
+            buf = self.receiveLine()
 
             if CMD_OK in buf:
                 return self
@@ -78,7 +78,7 @@ class RotationTable():
 
         self.conn.write(cmd_format)
 
-    def __receiveLine(self, isTimeout=True):
+    def receiveLine(self, isTimeout=True):
 
         if isTimeout:
             start = time.time()
@@ -101,17 +101,17 @@ class RotationTable():
     def test(self):
         self.__sendLine(f"test")
 
-        return CMD_OK in self.__receiveLine()
+        return CMD_OK in self.receiveLine()
 
     def getAxisStatus(self, ax: AxisName):
 
         self.__sendLine(f"status {ax.value}")
-        return Axis(**json.loads(self.__receiveLine()))
+        return Axis(**json.loads(self.receiveLine()))
 
     def readHall(self, ax: AxisName, Nmean: int = 100):
         self.__sendLine(f"readhall {ax.value} {Nmean}")
 
-        return float(self.__receiveLine())
+        return float(self.receiveLine())
 
     def steps(self, ax: AxisName, Nsteps: int, isReverse: bool = False, isBlocking=True):
 
@@ -123,7 +123,7 @@ class RotationTable():
 
         if isBlocking:
             while True:
-                if CMD_OK in self.__receiveLine(isTimeout=False):
+                if CMD_OK in self.receiveLine(isTimeout=False):
                     return
 
     def referenceAxis(self, ax: AxisName, isReverseBeforehand: bool = False, sTimeout: int = 120):
@@ -140,12 +140,12 @@ class RotationTable():
 
             start = time.time()
             while (time.time()-start < sTimeout):
-                if CMD_OK in self.__receiveLine():
+                if CMD_OK in self.receiveLine():
                     return True
             return False
 
         while True:
-            if CMD_OK in self.__receiveLine():
+            if CMD_OK in self.receiveLine():
                 return True
 
     def moveTo(self, ax: AxisName, position: int, currentPos: int = None):
